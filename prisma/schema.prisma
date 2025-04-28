@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  petOwner
+  vet
+}
+
+model User {
+  id          Int    @id @default(autoincrement())
+  email       String @unique
+  password    String
+  firstName   String
+  lastName    String
+  phoneNumber String @unique
+  role        Role   @default(petOwner)
+  profilePicture String?
+  address        String?
+
+  // Pet owner-specific
+ 
+  pets                 Pet[]
+  PetOwnerAppointments Appointment[]   @relation("UserAppointments")
+  // Vet-specific
+  licenceNumber String? @unique
+  specialties  String[] 
+  availability Json? 
+  bio          String?
+  VetAppointments      Appointment[]   @relation("VetAppointments")
+  medicalReports       MedicalReport[]
+  // Shared
+
+  messagesSent     Message[] @relation("MessagesSent")
+  messagesReceived Message[] @relation("MessagesReceived")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pet {
+  id              Int             @id @default(autoincrement())
+  name            String
+  species         String
+  breed           String?
+  age             Int?
+  profilePicture String?
+  ownerId         Int
+  mediacalReports MedicalReport[]
+
+  owner        User          @relation(fields: [ownerId], references: [id])
+  appointments Appointment[]
+}
+
+model Appointment {
+  id              Int               @id @default(autoincrement())
+  date            DateTime
+  reason          String?
+  medicalReportId Int?             @unique  
+  status          AppointmentStatus @default(pending)
+  medicalReport   MedicalReport?    @relation(name: "medicalReport", fields: [medicalReportId], references: [id])
+
+  petId   Int
+  vetId   Int
+  ownerId Int
+
+  pet   Pet  @relation(fields: [petId], references: [id])
+  vet   User @relation("VetAppointments", fields: [vetId], references: [id])
+  owner User @relation("UserAppointments", fields: [ownerId], references: [id])
+}
+
+enum AppointmentStatus {
+  pending
+  declined
+  confirmed
+  cancelled
+  completed
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  content    String
+  sentAt     DateTime @default(now())
+
+  sender   User @relation("MessagesSent", fields: [senderId], references: [id])
+  receiver User @relation("MessagesReceived", fields: [receiverId], references: [id])
+}
+
+model MedicalReport {
+  id            Int  @id @default(autoincrement())
+  petId         Int
+  vetId         Int
+  appointmentId Int?
+
+  title       String
+  description String
+  diagnosis   String?
+  treatment   String?
+  createdAt   DateTime     @default(now())
+  apointment  Appointment? @relation("medicalReport")
+  pet         Pet          @relation(fields: [petId], references: [id])
+  vet         User         @relation(fields: [vetId], references: [id])
+}
