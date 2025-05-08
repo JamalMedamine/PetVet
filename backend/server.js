@@ -6,6 +6,7 @@ import petOwnerRoutes from "./routes/petOwnerRoutes.js"
 import appointmentRoutes from "./routes/appointment.routes.js"
 import { ENV_VARS } from "./config/enVars.js";
 import bodyParser from "body-parser";
+import startAppointmentChecker from "./backgroudTasks/appointmentsChecker.js"
 
 const PORT = ENV_VARS.PORT ;
 const app = express();
@@ -18,7 +19,7 @@ app.use("/api/v1/users",usersRoutes);
 app.use("/api/v1/vets",vetRoutes);
 app.use("/api/v1/petOwners",petOwnerRoutes)
 app.use("/api/v1/appointment",appointmentRoutes)
-
+startAppointmentChecker();
 
 app.listen(PORT,()=>{
     console.log(`server listening to port ${PORT}`)

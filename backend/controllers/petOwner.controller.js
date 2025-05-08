@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 export async function addPet(req,res){
     try {
         const {id} = req.params;
-        const {name,species,breed,age,profilePicture}=req.body;
+        const {name,species,breed,age,weight,sex,profilePicture}=req.body;
         const petOwner = await prisma.user.findUnique({
             where:{id:Number(id)}
         })
@@ -21,6 +21,8 @@ export async function addPet(req,res){
                 species,
                 breed,
                 age,
+                weight,
+                sex,
                 profilePicture,
                 ownerId:petOwner.id,
             }
@@ -35,7 +37,7 @@ export async function addPet(req,res){
 export async function updatePet(req,res){
     try {
         const {id,petId}=req.params;
-        const { name, species, breed, age, profilePicture } = req.body;
+        const { name, species, breed,weight,sex, age, profilePicture } = req.body;
         const pet  = await prisma.pet.findUnique({
             where:{id:Number(petId)}
         })
@@ -49,6 +51,8 @@ export async function updatePet(req,res){
                 species,
                 breed,
                 age,
+                sex,
+                weight,
                 profilePicture
             }
         })

@@ -8,8 +8,8 @@ const prisma = new PrismaClient();
 
 export async function signup(req,res){
     try{
-    const {firstName , lastName , email , phoneNumber,password,role}= req.body
-        if(!firstName || !lastName || ! email || !phoneNumber || !role || !password){
+    const {firstName , lastName , email , phoneNumber,sex,password,role}= req.body
+        if(!firstName || !lastName || ! email || !phoneNumber || !role || !password||!sex){
             res.status(400).json({success:false ,message : "all field are required"})
         }
         const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
@@ -37,6 +37,7 @@ export async function signup(req,res){
                 email : email,
                 phoneNumber : phoneNumber,
                 password : hashedPassword,
+                sex,
                 role : role
             }
         })

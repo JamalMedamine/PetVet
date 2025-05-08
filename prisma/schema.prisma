@@ -26,6 +26,7 @@ model User {
   firstName   String
   lastName    String
   phoneNumber String @unique
+  sex         sex
   role        Role   @default(petOwner)
   profilePicture String?
   address        String?
@@ -56,6 +57,8 @@ model Pet {
   species         String
   breed           String?
   age             Int?
+  weight          Float?
+  sex             sex
   profilePicture String?
   ownerId         Int
   mediacalReports MedicalReport[]
@@ -88,6 +91,12 @@ enum AppointmentStatus {
   cancelled
   completed
 }
+
+enum sex {
+  male
+  female
+}
+
 
 model Message {
   id         Int      @id @default(autoincrement())
